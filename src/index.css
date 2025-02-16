@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inconsolata:wght@200..900&family=Karla:ital,wght@0,200..800;1,200..800&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Overpass:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+@theme {
+    --color-nav: #616161;
+}
+
+@layer base {
+    #root {
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box;
+        max-width: none !important;
+    }
+}
+
+@layer components {
+    .navigation span {
+        @apply pr-7 text-[#616161] cursor-pointer hover:underline;
+    }
+
+    .header {
+        @apply font-[Roboto] bg-[#BEEBC2] text-[#616161] py-7 w-full
+    }
+
+    .descriptionHeader {
+        @apply w-lg pl-5 ml-10
+    }
+
+    .featuresDesc input {
+        @apply border-2 w-md ml-5 float-left border-green-500 rounded-md px-4 py-2 mt-3 focus:outline-none focus:ring-2 focus:ring-green-300 transition duration-300 ease-in-out hover:bg-green-50
+    }
+
+    .descriptionHeader button {
+        @apply px-13 py-2 rounded-xl text-black mt-6 cursor-pointer
+    }
+
+    .features span {
+        @apply font-bold underline
+    }
+
+    .featuresDesc li {
+        @apply leading-7.5 text-base ml-4 text-[#333333];
+    }
+
+    .featuresDesc h2, h3, li {
+        @apply mt-5
+    }
+
+    .images img {
+        @apply  w-md rounded-2xl
+    }
+
+    .featuresSearch button {
+        @apply px-13 py-2 ml-4 mt-3 h-[44px] rounded-xl text-black cursor-pointer bg-[#68a56d] hover:bg-[#5a8e58] transform transition hover:scale-105
+    }
+}
