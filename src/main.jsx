@@ -5,7 +5,7 @@ import './index.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <HashRouter basename="/Food-nutrition-app">
+  <HashRouter basename={base}>
     <App />
   </HashRouter>
   
