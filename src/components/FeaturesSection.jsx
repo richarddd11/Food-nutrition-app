@@ -24,7 +24,7 @@ const FeaturesSection = ({ query, setQuery, handleSearch, disabled }) => {
             placeholder="Enter a food name..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:ring-2 focus:ring-green-500"
+            className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
           />
           <button
             onClick={handleSearch}
