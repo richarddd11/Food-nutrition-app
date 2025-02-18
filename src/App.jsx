@@ -20,6 +20,14 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const ScrollToTop = () => {
+    const { pathname } = useLocation();
+
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, [pathname])
+  }
+
   useEffect(() => {
     if(location.pathname === '/') {
       setDisabled(false);
@@ -88,6 +96,7 @@ function App() {
     return (
       <div>
         <Navigation />
+        <ScrollToTop />
         <Routes>
           <Route
           path='/'

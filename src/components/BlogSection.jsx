@@ -1,5 +1,5 @@
-import React from 'react'
-import { Link } from "react-router-dom";
+import React, { useEffect } from 'react'
+import { Link, useLocation } from "react-router-dom";
 
 const blogPosts = [
     {
@@ -26,6 +26,17 @@ const blogPosts = [
   ];
 
 const BlogSection = () => {
+
+  const location = useLocation()
+  
+  useEffect(() => {
+    if(location.state && location.state.scrollTo) {
+      const element = document.getElementById(`blog-${location.state.scrollTo}`);
+      if (element) {
+        element.scrollIntoView({behavior: 'smooth'});
+      }
+    }
+  }, [location]);
   return (
     <div>
         <section className='max-w-6xl mx-auto pb-16 px-6'>
@@ -34,7 +45,7 @@ const BlogSection = () => {
             </h2>
             <div className="grid gird-cols-1 md:grid-cols-3 gap-8">
                 {blogPosts.map((post) => (
-                    <div key={post.id} className='bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition'>
+                    <div key={post.id} id={`blog-${post.id}`} className='bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition'>
                         <img src={post.image} alt={post.title} className='w-full h-48 object-cover' />
                         <div className="p-6">
                             <h3 className='text-2xl font-bold text-green-600'>{post.title}</h3>

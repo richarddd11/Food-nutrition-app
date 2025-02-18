@@ -92,7 +92,7 @@ const BlogDetail = () => {
             <img src={post.image} alt={post.title} className='w-full h-80 object-cover rounded-lg mb-6' />
             <h1 className='text-4xl font-bold text-green-700'>{post.title}</h1>
             <div className='text-gray-700 mt-6 leading-fixed'>{post.content}</div>
-            <Link to="/" className='inline-block mt-6 text-green-700 font-semibold hover:underline'> ← Späť na blog</Link>
+            <Link to="/" state={{ scrollTo: post.id }} className='inline-block mt-6 text-green-700 font-semibold hover:underline'> ← Späť na blog</Link>
         </section>
     </div>
   )
