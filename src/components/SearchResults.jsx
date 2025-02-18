@@ -1,6 +1,16 @@
 import React from "react";
+import Spinner from "./Spinner";
 
-const SearchResults = ({ results = [], query, setQuery, handleSearch, searchTerm = "", error }) => {
+const SearchResults = ({ results = [], query, setQuery, handleSearch, searchTerm, error, isLoading }) => {
+
+  if (isLoading) {
+    return (
+      <section className="min-h-screen bg-gray-100 text-gray-900 py-12 flex justify-center items-center">
+        <Spinner />
+      </section>
+    );
+  }
+  
   return (
     <section className="min-h-screen bg-gray-100 text-gray-900 py-12">
       <div className="max-w-6xl mx-auto px-6">

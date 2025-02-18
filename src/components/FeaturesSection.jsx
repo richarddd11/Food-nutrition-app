@@ -1,6 +1,6 @@
 import React from "react";
 
-const FeaturesSection = ({ query, setQuery, handleSearch }) => {
+const FeaturesSection = ({ query, setQuery, handleSearch, disabled }) => {
   return (
     <section className="max-w-5xl mx-auto py-16 px-6">
       <h2 className="text-4xl font-semibold text-green-700 text-center mb-6">Why Choose Our Platform?</h2>
@@ -28,7 +28,8 @@ const FeaturesSection = ({ query, setQuery, handleSearch }) => {
           />
           <button
             onClick={handleSearch}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+            disabled={disabled}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition disabled:bg-green-950"
           >
             Search
           </button>
