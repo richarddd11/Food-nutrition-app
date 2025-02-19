@@ -8,6 +8,7 @@ import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Spinner from './components/Spinner';
 import BlogSection from './components/BlogSection';
 import BlogDetail from './components/BlogDetail';
+import NutritionCalculator from './components/NutritionCalculator';
 
 function App() {
   const [query, setQuery] = useState('');
@@ -116,6 +117,7 @@ function App() {
         disabled={disabled}
         />
         <BlogSection />
+        <NutritionCalculator />
         </>
           }
           />
