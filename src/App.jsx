@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import Navigation from './components/Navigation';
 import Header from './components/Header';
@@ -22,10 +22,16 @@ function App() {
 
   const ScrollToTop = () => {
     const { pathname } = useLocation();
+    const prevPathname = useRef(location.pathname);
 
     useEffect(() => {
-      window.scrollTo(0, 0);
+      if (prevPathname.current !== location.pathname) {
+        window.scrollTo(0, 0);
+        prevPathname.current = location.pathname;
+      }
     }, [pathname])
+
+    return null;
   }
 
   useEffect(() => {
