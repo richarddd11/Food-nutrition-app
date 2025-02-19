@@ -10,7 +10,22 @@ import BlogSection from './components/BlogSection';
 import BlogDetail from './components/BlogDetail';
 import NutritionCalculator from './components/NutritionCalculator';
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 function App() {
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+  
   const [query, setQuery] = useState('');
   const [enrichedResults, setEnrichedResults] = useState([]);
   const [error, setError] = useState(null);
@@ -21,19 +36,9 @@ function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const ScrollToTop = () => {
-    const { pathname } = useLocation();
-    const prevPathname = useRef(location.pathname);
+  
 
-    useEffect(() => {
-      if (prevPathname.current !== location.pathname) {
-        window.scrollTo(0, 0);
-        prevPathname.current = location.pathname;
-      }
-    }, [pathname])
-
-    return null;
-  }
+  
 
   useEffect(() => {
     if(location.pathname === '/') {
