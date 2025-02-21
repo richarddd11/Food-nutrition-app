@@ -50,7 +50,7 @@ const NutritionCalculator = () => {
             type="number"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
+            className="focus:outline-none border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
             placeholder="Zadajte váhu"
           />
         </div>
@@ -62,7 +62,7 @@ const NutritionCalculator = () => {
             type="number"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
+            className="focus:outline-none border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
             placeholder="Zadajte výšku"
           />
         </div>
@@ -74,7 +74,7 @@ const NutritionCalculator = () => {
             type="number"
             value={age}
             onChange={(e) => setAge(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
+            className="focus:outline-none border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
             placeholder="Zadajte vek"
           />
         </div>
@@ -85,7 +85,7 @@ const NutritionCalculator = () => {
           <select 
             value={gender} 
             onChange={(e) => setGender(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
+            className=" focus:outline-none border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
           >
             <option value="male">Muž</option>
             <option value="female">Žena</option>
@@ -98,7 +98,7 @@ const NutritionCalculator = () => {
           <select
             value={activityLevel}
             onChange={(e) => setActivityLevel(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
+            className="focus:outline-none border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
           >
             <option value="1.2">Sedavý životný štýl</option>
             <option value="1.375">Ľahká aktivita (1-3x týždenne cvičenie)</option>
@@ -114,7 +114,7 @@ const NutritionCalculator = () => {
           <select
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
+            className="focus:outline-none border border-gray-300 rounded-lg px-4 py-3 w-full focus:ring-2 focus:ring-green-500 transition"
           >
             <option value="lose">Schudnúť</option>
             <option value="maintain">Udržať váhu</option>

@@ -1,19 +1,74 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa'
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../config/firebase';
+import { useNavigate } from 'react-router-dom';
+
 
 const Navigation = () => {
+  const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
   const toogleMenu = () => setMenuOpen(!menuOpen);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    })
+    return unsubscribe;
+  }, [])
+
+  
+
+  const renderNavLinks = () => {
+    if (!currentUser) {
+      // 1. Pouzivatel neni prihlaseny
+      return (
+        <>
+          <Link to="/" className="pr-7 text-[#616161] hover:underline">Domov</Link>
+          <Link to="/results" className="pr-7 text-[#616161] hover:underline">Vyhľadávanie</Link>
+          <Link to="/login" className="pr-7 text-[#616161] hover:underline">Prihlásiť sa</Link>
+          <Link to="/register" className="pr-7 text-[#616161] hover:underline">Registrácia</Link>
+        </>
+      )
+   } else {
+    // Pouzivatel je prihlaseny
+    // Skontrololujeme ci uz je email overeny
+    if (currentUser.emailVerified) {
+      // email je overeny
+      return (
+        <>
+          <Link to="/" className="pr-7 text-[#616161] hover:underline">Domov</Link>
+          <Link to="/results" className="pr-7 text-[#616161] hover:underline">Vyhľadávanie</Link>
+          <Link to="/profil" className="pr-7 text-[#616161] hover:underline">Profil</Link>
+          <Link to="/dashboard" className='pr-7 text-[#616161] cursor-pointer hover:underline'>Dashboard</Link>
+          <Link to="/logout" className="pr-7 text-[#616161] hover:underline">Odhlásiť sa</Link>
+        </>
+      );
+    } else {
+      // email neni overeny
+      return (
+        <>
+          <Link to="/" className="pr-7 text-[#616161] hover:underline">Domov</Link>
+          <Link to="/results" className="pr-7 text-[#616161] hover:underline">Vyhľadávanie</Link>
+          <Link to="/verify-email" className="pr-7 text-[#616161] hover:underline">Over si email</Link>
+          <button to="/logout" className="pr-7 text-[#616161] hover:underline">Odhlásiť sa</button>
+        </>
+      );
+    }
+   }
+  }
+
+
 
   return (
     <nav className="bg-white shadow-md fixed top-0 left-0 w-full py-4 px-10 flex justify-between items-center z-50">
       <span className="text-2xl font-bold text-green-700">GetFit</span>
+
       <div className="hidden md:flex space-x-6 text-gray-700 font-bold">
-      <Link to="/" className='pr-7 text-[#616161] cursor-pointer hover:underline'>Domov</Link>
-          <Link to="/results" className='pr-7 text-[#616161] cursor-pointer hover:underline'>Vyhľadavanie</Link>
-          <Link to="/dashboard" className='pr-7 text-[#616161] cursor-pointer hover:underline'>Dashboard</Link>
-          <Link to="/profile" className='pr-7 text-[#616161] cursor-pointer hover:underline'>Profil</Link>
+      {renderNavLinks()}
       </div>
 
       <div className="md:hidden">
@@ -21,38 +76,13 @@ const Navigation = () => {
       </div>
 
       <div
-        className={`absolute top-full left-0 w-full bg-white shadow-md flex flex-col items-center py-4 space-y-4 md:hidden transition-all duration-300 overflow-hidden ${
-          menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`
+          absolute top-full left-0 w-full bg-white shadow-md flex flex-col items-center py-4 space-y-4 
+          md:hidden transition-all duration-300 overflow-hidden
+          ${menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}
+        `}
       >
-        <Link 
-          to="/" 
-          className='text-[#616161] cursor-pointer hover:underline'
-          onClick={() => setMenuOpen(false)}
-        >
-          Domov
-        </Link>
-        <Link 
-          to="/results" 
-          className='text-[#616161] cursor-pointer hover:underline'
-          onClick={() => setMenuOpen(false)}
-        >
-          Vyhľadavanie
-        </Link>
-        <Link 
-          to="/dashboard" 
-          className='text-[#616161] cursor-pointer hover:underline'
-          onClick={() => setMenuOpen(false)}
-        >
-          Dashboard
-        </Link>
-        <Link 
-          to="/profile" 
-          className='text-[#616161] cursor-pointer hover:underline'
-          onClick={() => setMenuOpen(false)}
-        >
-          Profil
-        </Link>
+        {renderNavLinks()}
       </div>
     </nav>
   );

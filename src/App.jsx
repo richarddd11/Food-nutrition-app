@@ -9,6 +9,12 @@ import Spinner from './components/Spinner';
 import BlogSection from './components/BlogSection';
 import BlogDetail from './components/BlogDetail';
 import NutritionCalculator from './components/NutritionCalculator';
+import Register from './components/Register';
+import VerifyEmail from './components/VerifyEmail';
+import Dashboard from './components/Dashboard'
+import ProtectedRoute from './components/ProtectedRoute';
+import Logout from './components/Logout';
+import Login from './components/Login';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -19,6 +25,7 @@ const ScrollToTop = () => {
 
   return null;
 }
+
 function App() {
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
@@ -35,10 +42,6 @@ function App() {
 
   const navigate = useNavigate();
   const location = useLocation();
-
-  
-
-  
 
   useEffect(() => {
     if(location.pathname === '/') {
@@ -110,6 +113,12 @@ function App() {
         <Navigation />
         <ScrollToTop />
         <Routes>
+          
+          <Route path='/register' element={<Register />}/>
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/logout' element={<Logout />} /> 
+          <Route path="/dashboard" element={ <ProtectedRoute> <Dashboard /> </ ProtectedRoute>} />
           <Route
           path='/'
           element={
