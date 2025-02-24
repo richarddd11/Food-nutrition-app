@@ -20,17 +20,20 @@ const Navigation = () => {
     return unsubscribe;
   }, [])
 
+  const handleLinkClick = () => {
+    setMenuOpen(false);
+  }
   
 
-  const renderNavLinks = () => {
+  const renderNavLinks = (onClickHandler) => {
     if (!currentUser) {
       // 1. Pouzivatel neni prihlaseny
       return (
         <>
-          <Link to="/" className="pr-7 text-[#616161] hover:underline">Domov</Link>
-          <Link to="/results" className="pr-7 text-[#616161] hover:underline">Vyhľadávanie</Link>
-          <Link to="/login" className="pr-7 text-[#616161] hover:underline">Prihlásiť sa</Link>
-          <Link to="/register" className="pr-7 text-[#616161] hover:underline">Registrácia</Link>
+          <Link to="/" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Domov</Link>
+          <Link to="/results" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Vyhľadávanie</Link>
+          <Link to="/login" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Prihlásiť sa</Link>
+          <Link to="/register" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Registrácia</Link>
         </>
       )
    } else {
@@ -40,21 +43,21 @@ const Navigation = () => {
       // email je overeny
       return (
         <>
-          <Link to="/" className="pr-7 text-[#616161] hover:underline">Domov</Link>
-          <Link to="/results" className="pr-7 text-[#616161] hover:underline">Vyhľadávanie</Link>
-          <Link to="/profil" className="pr-7 text-[#616161] hover:underline">Profil</Link>
-          <Link to="/dashboard" className='pr-7 text-[#616161] cursor-pointer hover:underline'>Dashboard</Link>
-          <Link to="/logout" className="pr-7 text-[#616161] hover:underline">Odhlásiť sa</Link>
+          <Link to="/" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Domov</Link>
+          <Link to="/results" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Vyhľadávanie</Link>
+          <Link to="/profil" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Profil</Link>
+          <Link to="/dashboard" className='pr-7 text-[#616161] cursor-pointer hover:underline' onClick={onClickHandler}>Dashboard</Link>
+          <Link to="/logout" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Odhlásiť sa</Link>
         </>
       );
     } else {
       // email neni overeny
       return (
         <>
-          <Link to="/" className="pr-7 text-[#616161] hover:underline">Domov</Link>
-          <Link to="/results" className="pr-7 text-[#616161] hover:underline">Vyhľadávanie</Link>
-          <Link to="/verify-email" className="pr-7 text-[#616161] hover:underline">Over si email</Link>
-          <button to="/logout" className="pr-7 text-[#616161] hover:underline">Odhlásiť sa</button>
+          <Link to="/" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Domov</Link>
+          <Link to="/results" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Vyhľadávanie</Link>
+          <Link to="/verify-email" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Over si email</Link>
+          <Link to="/logout" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Odhlásiť sa</Link>
         </>
       );
     }
@@ -82,7 +85,7 @@ const Navigation = () => {
           ${menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}
         `}
       >
-        {renderNavLinks()}
+        {renderNavLinks(handleLinkClick)}
       </div>
     </nav>
   );

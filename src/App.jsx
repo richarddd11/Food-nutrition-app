@@ -15,6 +15,9 @@ import Dashboard from './components/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute';
 import Logout from './components/Logout';
 import Login from './components/Login';
+import Terms from './components/Terms';
+import Privacy from './components/Privacy'
+
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -115,6 +118,8 @@ function App() {
         <Routes>
           
           <Route path='/register' element={<Register />}/>
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path='/login' element={<Login />} />
           <Route path='/logout' element={<Logout />} /> 

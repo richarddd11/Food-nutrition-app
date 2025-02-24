@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase' 
 
@@ -38,10 +38,12 @@ const Login = () => {
 
         <button 
           type="submit" 
-          className="bg-green-600 text-white px-6 py-2 mt-4 w-full rounded-lg hover:bg-green-700"
+          className="bg-green-600 text-white px-6 py-2 mb-3 mt-4 w-full rounded-lg hover:bg-green-700"
         >
           Prihlásiť sa
         </button>
+
+        <Link to='/register' className="text-blue-600 underline">Nemáš ešte účet ? Vytvor si ho</Link>
       </form>
     </section>
   )

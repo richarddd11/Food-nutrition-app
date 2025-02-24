@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -12,7 +12,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDPgMa2cQIJJHAD5loZZrQOrn8oGyCtuXQ",
   authDomain: "getfit-79396.firebaseapp.com",
   projectId: "getfit-79396",
-  storageBucket: "getfit-79396.firebasestorage.app",
+  storageBucket: "getfit-79396.appspot.com",
   messagingSenderId: "241827461493",
   appId: "1:241827461493:web:704bb4a0c2d368043ebb3c",
   measurementId: "G-J44KNXJ2BP"
@@ -24,3 +24,4 @@ const analytics = getAnalytics(app);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const googleProvider = new GoogleAuthProvider();

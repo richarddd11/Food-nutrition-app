@@ -1,17 +1,21 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
-import { auth, db } from "../config/firebase";
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, getRedirectResult, signInWithRedirect } from 'firebase/auth';
+import { auth, db, googleProvider } from "../config/firebase";
 import { doc, setDoc } from 'firebase/firestore';
+import Spinner from './Spinner';
 
 const Register = () => {
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Krok 1
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
+  const [isChecked, setIsChecked] = useState(false)
+  const [googleUser, setGoogleUser] = useState(null);
 
   // Krok 2 - osobné údaje
   const [age, setAge] = useState('');
@@ -23,10 +27,20 @@ const Register = () => {
   const [activity, setActivity] = useState('1.2');
   const [goal, setGoal] = useState('maintain');  // Zmenené z `SetGoal` na `setGoal`
   const [calories, setCalories] = useState(null);
+  const [isEditingBMI, setIsEditingBMI] = useState(false);
+  const [caloriesCalculated, setCaloriesCalculated] = useState(false);
 
   const [error, setError] = useState(null);       // Zmenené z `SetError` na `setError`
 
   const navigate = useNavigate();
+
+  if (isLoading) {
+    return (
+      <section className="min-h-screen bg-gray-100 text-gray-900 py-12 flex justify-center items-center">
+        <Spinner />
+      </section>
+    );
+  }
 
   // Funkcia na výpočet kalórií
   const calculateCalories = () => {
@@ -42,6 +56,7 @@ const Register = () => {
     if (goal === 'gain') dailyCalories += 500;
 
     setCalories(Math.round(dailyCalories));
+    setCaloriesCalculated(true);
   };
 
   // Kontrola zhodnosti hesiel
@@ -67,20 +82,25 @@ const Register = () => {
       return false;
     }
 
+    if (!isChecked) {
+      setError('Musíš súhlasiť s podmienkami používania a ochranou osobných údajov.');
+      return;
+    }
+    
     setError(null)
     return true;
   }
-
+  
   const handleNextStepOne = () => {
     if(validateStepOne()) {
       setStep(2);
     }
   }
+
   // Registrácia
   const handleRegister = async (e) => {
     e.preventDefault();
-
-
+     setIsLoading(true)
     try {
       // Vytvorenie užívateľa vo Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -95,6 +115,7 @@ const Register = () => {
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         name,
         email,
+        agreedToTerms: true,
         age,
         weight,
         height,
@@ -104,12 +125,14 @@ const Register = () => {
         calories,
       });
 
-      // Presmerovanie na dashboard
+      // Presmerovanie na verifikaciu
+      setIsLoading(false)
       navigate('/verify-email');
     } catch (err) {
       setError('Chyba pri registrácii: ' + err.message);
     }
   };
+
 
   return (
     <section className='max-w-md mt-30 mx-auto py-10 px-6 bg-white shadow-lg rounded-lg'>
@@ -160,6 +183,18 @@ const Register = () => {
               required
               className='border border-gray-300 rounded-lg px-4 py-2 w-full'
             />
+
+            <div className="mt-6 flex items-start">
+            <input 
+              type="checkbox" 
+              checked={isChecked} 
+              onChange={() => setIsChecked(!isChecked)} 
+              className="mr-2 ml-2 mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+            />
+            <label className="text-gray-600 mr-5">
+              Súhlasím s <Link to="/terms" className="text-blue-600 underline">podmienkami používania</Link> a <Link to="/privacy" className="text-blue-600 underline">ochranou osobných údajov</Link>.
+            </label>
+            </div>
 
             <button
               type='button'
@@ -252,19 +287,38 @@ const Register = () => {
               <option value="1.9">Extrémna aktivita</option>
             </select>
 
-            <button
-              type='button'
-              onClick={calculateCalories}
-              className='bg-blue-500 text-white px-6 py-2 mt-4 rounded-lg hover:bg-blue-600'
-            >
-              Vypočítať kalorický limit
-            </button>
-
-            {calories && (
-              <p className='mt-2 font-semibold text-center'>
-                Odporúčaný denný kalorický príjem: {calories} kcal
-              </p>
+            <label className='block mt-2'>BMI / Kalórie</label>
+            {isEditingBMI ? (
+              <input
+                type="number"
+                value={calories || ""}
+                onChange={(e) => setCalories(e.target.value)}
+                className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+              />
+            ) : (
+              <p className="mt-2 font-semibold text-center">{calories} kcal</p>
             )}
+
+            <div className="flex justify-between mt-4">
+              <button
+                type='button'
+                onClick={calculateCalories}
+                className='bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600'
+              >
+                Vypočítať BMI
+              </button>
+
+              {/* ✅ Tlačidlo "Upraviť" sa zobrazí iba ak boli kalórie vypočítané */}
+              {caloriesCalculated && (
+                <button
+                  type='button'
+                  onClick={() => setIsEditingBMI(!isEditingBMI)}
+                  className='bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600'
+                >
+                  {isEditingBMI ? "Uložiť" : "Upraviť"}
+                </button>
+              )}
+            </div>
 
             <button
               type='submit'
