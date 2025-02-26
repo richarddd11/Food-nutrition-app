@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
     if (loading) return <p>Načítavam...</p>
 
     if (!currentUser || !currentUser.emailVerified) {
-        return <Navigate to='/verify-email' />
+        return <Navigate to='/login' />
     }
 
     

@@ -17,6 +17,9 @@ import Logout from './components/Logout';
 import Login from './components/Login';
 import Terms from './components/Terms';
 import Privacy from './components/Privacy'
+import MyFoods from './components/MyFoods';
+import CalendarPage from './components/CalendarPage';
+
 
 
 const ScrollToTop = () => {
@@ -156,6 +159,11 @@ function App() {
           } 
         />
         <Route path='/blog/:id' element={<BlogDetail />} />
+        <Route path="/dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>}>
+        <Route index element={<CalendarPage />} />
+        <Route path="calendar" element={<ProtectedRoute> <CalendarPage /> </ProtectedRoute>} />
+        <Route path="my-foods" element={<ProtectedRoute> <MyFoods /> </ProtectedRoute> } />
+      </Route>
         </Routes>
         </div>
   ) 
