@@ -61,38 +61,24 @@ function App() {
     setIsLoading(true);
     setDisabled(true)
     setSearchTerm(query);
+
     setTimeout(async () => {
       
       console.log(`Sending request to Nutritionix API: ${new Date().toISOString()}`);
       try {
-        const instantURL = `https://trackapi.nutritionix.com/v2/search/instant?query=${encodeURIComponent(query)}`;
-        const instantResponse = await fetch(instantURL, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-APP-ID': import.meta.env.VITE_API_ID,
-            'X-APP-KEY': import.meta.env.VITE_API_KEY
-          }
-        });
+        const instantURL = `https://api.spoonacular.com/food/ingredients/search?query=${encodeURIComponent(query)}&number=10&apiKey=${import.meta.env.VITE_API_KEY}`;
+        const instantResponse = await fetch(instantURL)
         
         if (!instantResponse.ok) {
           throw new Error(`Instant API HTTP error: ${instantResponse.status}`);
         }
         
         const instantData = await instantResponse.json()
-        const options = instantData.common || [];
+        const options = instantData.results || [];
         
         const enrichedOptions = await Promise.all(options.map(async (option) => {
-          const nutrientsURL = `https://trackapi.nutritionix.com/v2/natural/nutrients`;
-          const nutrientsResponse = await fetch(nutrientsURL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-APP-ID': import.meta.env.VITE_API_ID,
-              'X-APP-KEY': import.meta.env.VITE_API_KEY
-            },
-            body: JSON.stringify({query: option.food_name})
-          });
+          const nutrientsURL = `https://api.spoonacular.com/food/ingredients/${option.id}/information?amount=100&unit=grams&apiKey=${import.meta.env.VITE_API_KEY}`;
+          const nutrientsResponse = await fetch(nutrientsURL)
           
           if(!nutrientsResponse.ok) {
             const errText = await nutrientsResponse.text();
@@ -100,7 +86,22 @@ function App() {
             return {...option, nutrition: null};
           }
           const nutrientsData = await nutrientsResponse.json();
-          return {...option, nutrition: nutrientsData.foods[0] };
+          const nutrientsArray = nutrientsData.nutrition?.nutrients || [];
+          const getNutrientValue = (name) => {
+            const nutrient = nutrientsArray.find(n => n.name.toLowerCase() === name.toLowerCase())
+            return nutrient ? nutrient.amount : 0;
+          }
+
+          const nutrition = {
+            servingSize: '100g',
+            photo: { thumb: `https://spoonacular.com/cdn/ingredients_500x500/${option.image}` },
+            nf_calories: getNutrientValue('Calories'),
+            nf_total_fat: getNutrientValue('Fat'),
+            nf_protein: getNutrientValue('Protein'),
+            nf_total_carbohydrate: getNutrientValue('Carbohydrates')
+          };
+  
+          return { ...option, food_name: option.name, nutrition };
         }))
         
         setEnrichedResults(enrichedOptions);

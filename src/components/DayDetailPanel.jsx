@@ -3,7 +3,7 @@ import DailyNutritionOverview from './DailyNutritionOverview'
 
 const DayDetailPanel = ({ selectedDate, overviewData, eventsForDay }) => {
   return (
-    <div className='w-full lg:w-2/3 bg-white rounded-lg shadow p-4'>
+    <div className='w-full lg:w-3/3 bg-white rounded-lg shadow p-4'>
         {selectedDate && overviewData ? (
             <div>
                 <h2 className='text-xl font-bold text-green-700 mb-3'>{selectedDate}</h2>

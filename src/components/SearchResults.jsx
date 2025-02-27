@@ -55,6 +55,11 @@ const SearchResults = ({ results = [], query, setQuery, handleSearch, searchTerm
                 >
                   <img src={image} alt={food_name} className="w-full h-40 object-cover rounded-md" />
                   <h3 className="text-xl font-bold text-gray-800 mt-3">{food_name}</h3>
+                  {nutrition?.servingSize && (
+                    <p className="text-gray-600 text-sm mt-1">
+                      Nutričné hodnoty pre: <strong>{nutrition.servingSize}</strong>
+                    </p>
+                  )}
                   <div className="text-gray-600 text-sm leading-relaxed mt-2">
                     <p><strong className="text-green-600">Kalórie:</strong> {calories} kcal</p>
                     <p><strong className="text-green-600">Tuky:</strong> {fat} g</p>
