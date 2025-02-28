@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, getRedirectResult, signInWithRedirect } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, getRedirectResult, signInWithRedirect, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { auth, db, googleProvider } from "../config/firebase";
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import Spinner from './Spinner';
 
 const Register = () => {
@@ -25,12 +25,18 @@ const Register = () => {
 
   // Krok 3
   const [activity, setActivity] = useState('1.2');
-  const [goal, setGoal] = useState('maintain');  // Zmenené z `SetGoal` na `setGoal`
+  const [goal, setGoal] = useState('maintain');
   const [calories, setCalories] = useState(null);
   const [isEditingBMI, setIsEditingBMI] = useState(false);
   const [caloriesCalculated, setCaloriesCalculated] = useState(false);
 
-  const [error, setError] = useState(null);       // Zmenené z `SetError` na `setError`
+  // Vypočítane hodnoty
+  const [dailyCalories, setDailyCalories] = useState(null);
+  const [proteinGrams, setProteinGrams] = useState(null);
+  const [fatGrams, setFatGrams] = useState(null);
+  const [carbsGrams, setCarbsGrams] = useState(null);
+
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
@@ -44,24 +50,29 @@ const Register = () => {
 
   // Funkcia na výpočet kalórií
   const calculateCalories = () => {
-    let BMR;
-    if (gender === 'male') {
-      BMR = 88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age);
-    } else {
-      BMR = 447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age);
-    }
+    const numWeight = Number(weight);
+  const numHeight = Number(height);
+  const numAge = Number(age);
+  
+  let BMR;
+  if (gender === 'male') {
+    BMR = 88.36 + (13.4 * numWeight) + (4.8 * numHeight) - (5.7 * numAge);
+  } else {
+    BMR = 447.6 + (9.2 * numWeight) + (3.1 * numHeight) - (4.3 * numAge);
+  }
 
-    let dailyCalories = BMR * activity;
-    if (goal === 'lose') dailyCalories -= 500;
-    if (goal === 'gain') dailyCalories += 500;
+  let dailyCalories = BMR * Number(activity);
+  if (goal === 'lose') dailyCalories -= 500;
+  if (goal === 'gain') dailyCalories += 500;
 
     setCalories(Math.round(dailyCalories));
     setCaloriesCalculated(true);
   };
 
-  // Kontrola zhodnosti hesiel
-  const validateStepOne = () => {
-    if (!email || !email.includes('@')) {
+  const validateStepOne = async () => {
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
       setError('Prosím, zadaj platný email.');
       return false;
     }
@@ -81,29 +92,54 @@ const Register = () => {
       setError('Heslá sa nezhodujú.');
       return false;
     }
-
     if (!isChecked) {
       setError('Musíš súhlasiť s podmienkami používania a ochranou osobných údajov.');
-      return;
+      return false;
     }
     
-    setError(null)
+    const checkEmailInFirestore = async (trimmedEmail) => {
+      const q = query(collection(db, 'users'), where('email', '==', trimmedEmail))
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    }
+    try {
+      // Overenie, či email už existuje
+      const signInMethods = await fetchSignInMethodsForEmail(auth, trimmedEmail);
+      if (signInMethods.length > 0) {
+        setError('Tento email už existuje.');
+        return false;
+      }
+
+      const existInFirestore = await checkEmailInFirestore(trimmedEmail);
+      if (existInFirestore) {
+        setError("Tento email už existuje.")
+        return false;
+      }
+    } catch (error) {
+      console.error("Chyba pri overovaní emailu:", error);
+      setError('Nastala chyba pri overovaní emailu.');
+      return false;
+    }
+    
+    setError(null);
     return true;
-  }
+  };
   
-  const handleNextStepOne = () => {
-    if(validateStepOne()) {
+  const handleNextStepOne = async () => {
+    const isValid = await validateStepOne();
+    if (isValid) {
       setStep(2);
     }
-  }
+  };
 
   // Registrácia
   const handleRegister = async (e) => {
     e.preventDefault();
-     setIsLoading(true)
+     setIsLoading(true);
+     const trimmedEmail = email.trim().toLowerCase();
     try {
       // Vytvorenie užívateľa vo Firebase
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, trimmedEmail, password);
 
       // Nastavenie mena používateľa
       await updateProfile(userCredential.user, { displayName: name });
@@ -114,7 +150,7 @@ const Register = () => {
       // Uloženie údajov do Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         name,
-        email,
+        email: trimmedEmail,
         agreedToTerms: true,
         age,
         weight,
@@ -308,7 +344,7 @@ const Register = () => {
                 Vypočítať BMI
               </button>
 
-              {/* ✅ Tlačidlo "Upraviť" sa zobrazí iba ak boli kalórie vypočítané */}
+              
               {caloriesCalculated && (
                 <button
                   type='button'
