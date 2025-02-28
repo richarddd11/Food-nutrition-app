@@ -1,11 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../config/firebase";
 
 const Dashboard = () => {
   const [savedFoods, setSavedFoods] = useState([]);
+  const [nutritionGoal, setNutritiongoal] = useState(null);
+
+  useEffect(() => {
+    const fetchNutritionGoal = async () => {
+      const user = auth.currentUser;
+      if(!user) return;
+      try {
+        const docRef = doc(db, 'users', user.uid);
+        const docSnap = await getDoc(docRef);
+        if(docSnap.exists()) {
+          setNutritiongoal(docSnap.data());
+        }
+      } catch (error) {
+        console.error("Chyba pri načítaní nutričných údajov:", error);
+      }
+    }
+    fetchNutritionGoal();
+  }, [])
 
   const handleDeleteFood = async (id) => {
     try {
@@ -78,7 +96,7 @@ const Dashboard = () => {
       <Sidebar />
       <div className="flex-1">
         {/* Tu sa vykreslia podstránky z routingu */}
-        <Outlet context={{ savedFoods, handleAddCustomFood, handleDeleteFood, handleEditFood }} />
+        <Outlet context={{ savedFoods, handleAddCustomFood, handleDeleteFood, handleEditFood, nutritionGoal }} />
       </div>
     </div>
   )

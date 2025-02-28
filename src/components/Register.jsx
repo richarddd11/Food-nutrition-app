@@ -61,11 +61,27 @@ const Register = () => {
     BMR = 447.6 + (9.2 * numWeight) + (3.1 * numHeight) - (4.3 * numAge);
   }
 
-  let dailyCalories = BMR * Number(activity);
-  if (goal === 'lose') dailyCalories -= 500;
-  if (goal === 'gain') dailyCalories += 500;
+  let calories = BMR * Number(activity);
+  if (goal === 'lose') {
+    calories -= 500;
+  } else if (goal === 'gain') {
+    calories += 500;
+  }  
 
-    setCalories(Math.round(dailyCalories));
+    calories = Math.round(calories);
+    setDailyCalories(calories);
+
+    // Makroživiny:
+    // Predpokladáme: 30% kalórií z proteínov, 25% z tukov, 45% z sacharidov.
+    // Prepočítame na gramy:
+    // 1 g proteínu a sacharidov = 4 kcal, 1 g tuku = 9 kcal.
+    const proteinCalc = Math.round((0.30 *  calories) / 4);
+    const fatCalc = Math.round((0.25 *  calories) / 9);
+    const carbsCalc = Math.round((0.45 *  calories) / 4);
+    setProteinGrams(proteinCalc);
+    setFatGrams(fatCalc);
+    setCarbsGrams(carbsCalc);
+
     setCaloriesCalculated(true);
   };
 
@@ -137,6 +153,34 @@ const Register = () => {
     e.preventDefault();
      setIsLoading(true);
      const trimmedEmail = email.trim().toLowerCase();
+
+     calculateCalories();
+
+     if(!dailyCalories || !proteinGrams || !fatGrams || !carbsGrams) {
+      let BMR;
+      if (gender === 'male') {
+        BMR = 88.36 + (13.4 * Number(weight)) + (4.8 * Number(height)) - (5.7 * Number(age));
+      } else {
+        BMR = 447.6 + (9.2 * Number(weight)) + (3.1 * Number(height)) - (4.3 * Number(age));
+      }
+      let calories = BMR * Number(activity);
+      if (goal === 'lose') {
+        calories -= 500;
+      } else if (goal === 'gain') {
+        calories += 500;
+      }
+      calories = Math.round(calories);
+      const proteinCalc = Math.round((0.30 * calories) / 4);
+      const fatCalc = Math.round((0.25 * calories) / 9);
+      const carbsCalc = Math.round((0.45 * calories) / 4);
+      setDailyCalories(calories);
+      setProteinGrams(proteinCalc);
+      setFatGrams(fatCalc);
+      setCarbsGrams(carbsCalc);
+
+      setCaloriesCalculated(true);
+     }
+
     try {
       // Vytvorenie užívateľa vo Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, trimmedEmail, password);
@@ -152,13 +196,16 @@ const Register = () => {
         name,
         email: trimmedEmail,
         agreedToTerms: true,
-        age,
-        weight,
-        height,
+        age: Number(age),
+        weight: Number(weight),
+        height: Number(height),
         gender,
-        activity,
+        activity: Number(activity),
         goal,
-        calories,
+        dailyCalories,
+        proteinGrams,
+        fatGrams,
+        carbsGrams,
       });
 
       // Presmerovanie na verifikaciu
@@ -299,70 +346,108 @@ const Register = () => {
         {/* KROK 3 */}
         {step === 3 && (
           <>
-            <label className='block mt-2'>Cieľ</label>
-            <select
-              value={goal}
-              onChange={(e) => setGoal(e.target.value)}
+          <label className='block mt-2'>Cieľ</label>
+          <select
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+            className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+          >
+            <option value="lose">Schudnúť</option>
+            <option value="maintain">Udržať váhu</option>
+            <option value="gain">Nabrať svaly</option>
+          </select>
+      
+          <label className='block mt-2'>Úroveň aktivity</label>
+          <select
+            value={activity}
+            onChange={(e) => setActivity(e.target.value)}
+            className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+          >
+            <option value="1.2">Sedavý životný štýl</option>
+            <option value="1.375">Ľahká aktivita (1-3x/týž)</option>
+            <option value="1.55">Stredná aktivita (3-5x/týž)</option>
+            <option value="1.725">Vysoká aktivita (6-7x/týž)</option>
+            <option value="1.9">Extrémna aktivita</option>
+          </select>
+      
+          {/* BMR / Kalórie */}
+          <label className='block mt-2 font-semibold'>BMR / Kalórie</label>
+          {isEditingBMI ? (
+            <input
+              type="number"
+              value={dailyCalories || ""}
+              onChange={(e) => setDailyCalories(Number(e.target.value))}
               className='border border-gray-300 rounded-lg px-4 py-2 w-full'
-            >
-              <option value="lose">Schudnúť</option>
-              <option value="maintain">Udržať váhu</option>
-              <option value="gain">Nabrať svaly</option>
-            </select>
-
-            <label className='block mt-2'>Úroveň aktivity</label>
-            <select
-              value={activity}
-              onChange={(e) => setActivity(e.target.value)}
+            />
+          ) : (
+            <p className="mt-2 font-semibold text-center">{dailyCalories} kcal</p>
+          )}
+      
+          {/* Proteíny */}
+          <label className='block mt-2 font-semibold'>Proteíny (g)</label>
+          {isEditingBMI ? (
+            <input
+              type="number"
+              value={proteinGrams || ""}
+              onChange={(e) => setProteinGrams(Number(e.target.value))}
               className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+            />
+          ) : (
+            <p className="mt-2 font-semibold text-center">{proteinGrams} g</p>
+          )}
+      
+          {/* Tuky */}
+          <label className='block mt-2 font-semibold'>Tuky (g)</label>
+          {isEditingBMI ? (
+            <input
+              type="number"
+              value={fatGrams || ""}
+              onChange={(e) => setFatGrams(Number(e.target.value))}
+              className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+            />
+          ) : (
+            <p className="mt-2 font-semibold text-center">{fatGrams} g</p>
+          )}
+      
+          {/* Sacharidy */}
+          <label className='block mt-2 font-semibold'>Sacharidy (g)</label>
+          {isEditingBMI ? (
+            <input
+              type="number"
+              value={carbsGrams || ""}
+              onChange={(e) => setCarbsGrams(Number(e.target.value))}
+              className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+            />
+          ) : (
+            <p className="mt-2 font-semibold text-center">{carbsGrams} g</p>
+          )}
+      
+          <div className="flex justify-between mt-4">
+            <button
+              type='button'
+              onClick={calculateCalories}
+              className='bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600'
             >
-              <option value="1.2">Sedavý životný štýl</option>
-              <option value="1.375">Ľahká aktivita (1-3x/týž)</option>
-              <option value="1.55">Stredná aktivita (3-5x/týž)</option>
-              <option value="1.725">Vysoká aktivita (6-7x/týž)</option>
-              <option value="1.9">Extrémna aktivita</option>
-            </select>
-
-            <label className='block mt-2'>BMI / Kalórie</label>
-            {isEditingBMI ? (
-              <input
-                type="number"
-                value={calories || ""}
-                onChange={(e) => setCalories(e.target.value)}
-                className='border border-gray-300 rounded-lg px-4 py-2 w-full'
-              />
-            ) : (
-              <p className="mt-2 font-semibold text-center">{calories} kcal</p>
-            )}
-
-            <div className="flex justify-between mt-4">
+              Vypočítať BMR a makrá
+            </button>
+            {caloriesCalculated && (
               <button
                 type='button'
-                onClick={calculateCalories}
-                className='bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600'
+                onClick={() => setIsEditingBMI(!isEditingBMI)}
+                className='bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600'
               >
-                Vypočítať BMI
+                {isEditingBMI ? "Uložiť" : "Upraviť"}
               </button>
-
-              
-              {caloriesCalculated && (
-                <button
-                  type='button'
-                  onClick={() => setIsEditingBMI(!isEditingBMI)}
-                  className='bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600'
-                >
-                  {isEditingBMI ? "Uložiť" : "Upraviť"}
-                </button>
-              )}
-            </div>
-
-            <button
-              type='submit'
-              className='bg-green-600 text-white px-6 py-2 mt-4 w-full rounded-lg hover:bg-green-700'
-            >
-              Registrovať sa
-            </button>
-          </>
+            )}
+          </div>
+      
+          <button
+            type='submit'
+            className='bg-green-600 text-white px-6 py-2 mt-4 w-full rounded-lg hover:bg-green-700'
+          >
+            Registrovať sa
+          </button>
+        </>
         )}
       </form>
     </section>

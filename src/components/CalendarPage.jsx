@@ -3,9 +3,10 @@ import CalendarPanel from './CalendarPanel';
 import DayDetailPanel from './DayDetailPanel';
 import AddFoodForm from './AddFoodForm';
 import Sidebar from './Sidebar';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useOutletContext } from 'react-router-dom';
 
 const CalendarPage = () => {
+  const { nutritionGoal } = useOutletContext();
   // Mock udalostí pre testovanie
   const initialEvents = [
     {
@@ -61,12 +62,12 @@ const CalendarPage = () => {
 
     const aggregatedData = {
       currentKcal: Math.max(sumKcal, 0),
-      goalKcal: 1500,
-      protein: { current: sumProtein, goal: 79 },
-      carbs: { current: sumCarbs, goal: 192 },
-      fat: { current: sumFat, goal: 43 },
-      fiber: { current: sumFiber, goal: 28 },
-      fluid: { current: parseFloat(sumFluid.toFixed(1)), goal: 1.2 },
+      goalKcal: nutritionGoal?.dailyCalories || 1500,  // Použije hodnotu z Firestore, ak existuje
+      protein: { current: sumProtein, goal: nutritionGoal?.proteinGrams || 79 },
+      carbs: { current: sumCarbs, goal: nutritionGoal?.carbsGrams || 192 },
+      fat: { current: sumFat, goal: nutritionGoal?.fatGrams || 43 },
+      fiber: { current: sumFiber, goal: nutritionGoal?.fiber || 28 },
+      fluid: { current: parseFloat(sumFluid.toFixed(1)), goal: nutritionGoal?.fluid || 1.2 },
       burned: sumBurned,
     };
     setOverviewData(aggregatedData);
