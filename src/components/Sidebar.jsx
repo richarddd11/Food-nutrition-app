@@ -15,6 +15,7 @@ const Sidebar = () => {
         <Link to="/dashboard/statistics" className="text-green-700 font-bold hover:underline">
           Štatistiky
         </Link>
+        <Link to='/dashboard/my-activites' className="text-green-700 font-bold hover:underline">Moje Aktivity</Link>
       </nav>
     </aside>
   );

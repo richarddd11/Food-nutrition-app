@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../config/firebase";
+import MyActivites from './MyActivites';
 
 const Dashboard = () => {
   const [savedFoods, setSavedFoods] = useState([]);
@@ -91,12 +92,70 @@ const Dashboard = () => {
 
     fetchFoods();
   }, []);
+
+  const [savedActivities, setSavedActivities] = useState([]);
+
+const handleAddActivity = async (activity) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+    const activityData = {...activity, userId: user.uid, userName: user.displayName}
+    const docRef = await addDoc(collection(db, 'activities'), activityData)
+
+    setSavedActivities((prev) => [
+      ...prev,
+      { id: docRef.id, ...activity }
+    ]);
+  } catch (error) {
+    console.error("Chyba pri načítaní aktivít:", error);
+  }
+};
+
+useEffect(() => {
+  const fetchActivities = async () => {
+    try {
+      const user = auth.currentUser;
+      if(!user) return;
+      const q = query(collection(db, 'activities'), where('userId', '==', user.uid))
+      const querySnapshot = await getDocs(q);
+      const activities = querySnapshot.docs.map(doc => ({id: doc.id, ...doc.data() }))
+      setSavedActivities(activities)
+    } catch (error) {
+      console.error('Vyskytla sa chyba');
+    }
+  }
+
+  fetchActivities()
+}, [])
+
+const handleDeleteActivity = async (id) => {
+  try {
+    const activityDocRef = doc(db, 'activities', id);
+    await deleteDoc(activityDocRef);
+    setSavedActivities((prev) => prev.filter((act) => act.id !== id));
+  } catch (error) {
+    console.error('Vyskytla sa chyba');
+  }
+};
+
+const handleEditActivity = async (id, updatedActivity) => {
+  try {
+    const updateDocActivity = doc(db, 'activities', id);
+    await updateDoc(updateDocActivity, updatedActivity);
+    setSavedActivities((prev) =>
+      prev.map((act) => (act.id === id ? { ...act, ...updatedActivity } : act))
+    );
+  } catch (error) {
+    console.error('Vyskytla sa chyba');
+  }
+};
+
   return (
     <div className='flex flex-col lg:flex-row gap-6 p-4 mt-20'>
       <Sidebar />
       <div className="flex-1">
         {/* Tu sa vykreslia podstránky z routingu */}
-        <Outlet context={{ savedFoods, handleAddCustomFood, handleDeleteFood, handleEditFood, nutritionGoal }} />
+        <Outlet context={{ savedFoods, handleAddCustomFood, handleDeleteFood, handleEditFood, nutritionGoal, handleEditActivity, handleAddActivity, savedActivities, handleDeleteActivity }} />
       </div>
     </div>
   )

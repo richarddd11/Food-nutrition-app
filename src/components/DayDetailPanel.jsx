@@ -1,7 +1,7 @@
 import React from 'react'
 import DailyNutritionOverview from './DailyNutritionOverview'
 
-const DayDetailPanel = ({ selectedDate, overviewData, eventsForDay }) => {
+const DayDetailPanel = ({ selectedDate, overviewData, eventsForDay, onDeleteEvent }) => {
   return (
     <div className='w-full lg:w-3/3 bg-white rounded-lg shadow p-4'>
         {selectedDate && overviewData ? (
@@ -16,7 +16,14 @@ const DayDetailPanel = ({ selectedDate, overviewData, eventsForDay }) => {
                         {eventsForDay.map((event, index) => (
                             <li key={index} className='p-2 bg-green-100 rounded shadow border-l-4 border-green-500'>
                                 {event.title}
+                                <button
+                    onClick={() => onDeleteEvent(event.id)}
+                    className="bg-red-500 text-white px-2 py-1 ml-5 rounded hover:bg-red-600"
+                  >
+                    Zmazať
+                  </button>
                             </li>
+                            
                         ))}
                     </ul>
                 </div>

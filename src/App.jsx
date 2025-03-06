@@ -19,6 +19,7 @@ import Terms from './components/Terms';
 import Privacy from './components/Privacy'
 import MyFoods from './components/MyFoods';
 import CalendarPage from './components/CalendarPage';
+import MyActivites from './components/MyActivites';
 
 
 
@@ -164,6 +165,7 @@ function App() {
         <Route index element={<CalendarPage />} />
         <Route path="calendar" element={<ProtectedRoute> <CalendarPage /> </ProtectedRoute>} />
         <Route path="my-foods" element={<ProtectedRoute> <MyFoods /> </ProtectedRoute> } />
+        <Route path="my-activites" element={<ProtectedRoute> <MyActivites /> </ProtectedRoute> } />
       </Route>
         </Routes>
         </div>

@@ -20,7 +20,6 @@ const CustomFoodForm = ({ onAddCustomFood }) => {
         fat: Number(fat),
         carbs: Number(carbs),
         fiber: Number(fiber),
-        fluid: Number(fluid),
     };
 
     onAddCustomFood(newFood);
@@ -32,7 +31,6 @@ const CustomFoodForm = ({ onAddCustomFood }) => {
     setFat('');
     setCarbs('');
     setFiber('');
-    setFluid('');
   }
   return (
     <form onSubmit={handleSubmit} className="p-4 bg-white rounded-lg shadow-md mb-4">
@@ -93,29 +91,18 @@ const CustomFoodForm = ({ onAddCustomFood }) => {
             placeholder="sacharidy"
           />
         </div>
+      </div>
         <div>
-          <label className="block text-gray-700">Vláknina (g):</label>
+          <label className="block text-gray-700 mt-2">Vláknina (g):</label>
           <input
             type="number"
             value={fiber}
             onChange={(e) => setFiber(e.target.value)}
             required
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className="w-1/2 mx-auto border border-gray-300 rounded px-3 py-2"
             placeholder="vláknina"
           />
         </div>
-        <div>
-          <label className="block text-gray-700">Tekutiny (l):</label>
-          <input
-            type="number"
-            value={fluid}
-            onChange={(e) => setFluid(e.target.value)}
-            required
-            className="w-full border border-gray-300 rounded px-3 py-2"
-            placeholder="tekutiny"
-          />
-        </div>
-      </div>
       <button type="submit" className="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
         Pridať jedlo
       </button>

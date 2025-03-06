@@ -4,6 +4,9 @@ import DayDetailPanel from './DayDetailPanel';
 import AddFoodForm from './AddFoodForm';
 import Sidebar from './Sidebar';
 import { Outlet, useOutletContext } from 'react-router-dom';
+import AddFluidForm from './AddFluidForm';
+import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebase';
 
 const CalendarPage = () => {
   const { nutritionGoal } = useOutletContext();
@@ -39,26 +42,51 @@ const CalendarPage = () => {
   const [events, setEvents] = useState(initialEvents);
   const [selectedDate, setSelectedDate] = useState(null);
   const [overviewData, setOverviewData] = useState(null);
+  const [fluidIntake, setFluidIntake] = useState({});
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const user = auth.currentUser;
+      if(!user) return;
+
+      try {
+        const q = query(
+          collection(db, 'calendarEvents'),
+          where('userId', '==', user.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        const fetchedEvents = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error('Chyba pri načítaní udalostí:', error);
+      }
+    }; 
+   fetchEvents() 
+  }, [])
 
   useEffect(() => {
     if (selectedDate) {
       const dayEvents = events.filter((e) => e.start === selectedDate);
       updateOverviewData(dayEvents);
     }
-  }, [events, selectedDate]);
+  }, [events, selectedDate, fluidIntake]);
 
   const updateOverviewData = (dayEvents) => {
     let sumKcal = 0, sumProtein = 0, sumFat = 0, sumCarbs = 0, sumFiber = 0, sumFluid = 0, sumBurned = 0;
     dayEvents.forEach((ev) => {
-      const { kcal, protein, fat, carbs, fiber, fluid, burned } = ev.extendedProps;
+      const { kcal, protein, fat, carbs, fiber, burned } = ev.extendedProps;
       sumKcal += kcal;
       sumProtein += protein;
       sumFat += fat;
       sumCarbs += carbs;
       sumFiber += fiber;
-      sumFluid += fluid;
       sumBurned += burned;
     });
+
+    const currentFluid = fluidIntake[selectedDate] || 0;
 
     const aggregatedData = {
       currentKcal: Math.max(sumKcal, 0),
@@ -67,7 +95,7 @@ const CalendarPage = () => {
       carbs: { current: sumCarbs, goal: nutritionGoal?.carbsGrams || 192 },
       fat: { current: sumFat, goal: nutritionGoal?.fatGrams || 43 },
       fiber: { current: sumFiber, goal: nutritionGoal?.fiber || 28 },
-      fluid: { current: parseFloat(sumFluid.toFixed(1)), goal: nutritionGoal?.fluid || 1.2 },
+      fluid: { current: currentFluid, goal: nutritionGoal?.fluid || 3 },
       burned: sumBurned,
     };
     setOverviewData(aggregatedData);
@@ -78,8 +106,41 @@ const CalendarPage = () => {
     };
 
 
-  const handleAddFood = (newEvent) => {
-    setEvents((prev) => [...prev, newEvent]);
+  const handleAddFood = async (newEvent) => {
+    const user = auth.currentUser;
+    if(!user) {
+      console.error('Používateľ nie je prihlásený');
+      return;
+    }
+    try {
+      const docRef = await addDoc(collection(db, 'calendarEvents'), {
+        ...newEvent,
+        userId: user.uid,
+        createdAt: new Date(),
+        userName: user.displayName
+      });
+      newEvent.id = docRef.id;
+      setEvents((prev) => [...prev, newEvent])
+    } catch (error) {
+      console.error('Chyba pri pridávaní udalosti:', error);
+    }
+    
+  }
+
+  const handleDeleteFood = async (eventId) => {
+    try {
+      await deleteDoc(doc(db, 'calendarEvents', eventId));
+      setEvents((prev) => prev.filter((event) => event.id !== eventId));
+    } catch (error) {
+      console.error('Chyba pri mazaní udalosti:', error);
+    }
+  }
+
+  const handleAddFluid = (date, amount) => {
+    setFluidIntake((prev) => ({
+      ...prev,
+      [date]: (prev[date] || 0) + amount,
+    }))
   }
 
   const eventsForDay = selectedDate ? events.filter((e) => e.start === selectedDate) : [];
@@ -93,11 +154,16 @@ const CalendarPage = () => {
       <div className='w-full lg:w-1/3'>
         {selectedDate && (
           <AddFoodForm selectedDate={selectedDate} onAddFood={handleAddFood} />
-        )}
+          )}
+          {selectedDate && (
+          <AddFluidForm selectedDate={selectedDate} onAddFluid={(amount) => handleAddFluid(selectedDate, amount)} />
+
+          )}
       <DayDetailPanel
         selectedDate={selectedDate}
         overviewData={overviewData}
         eventsForDay={eventsForDay}
+        onDeleteEvent={handleDeleteFood}
         />
         </div>
     </div>
