@@ -7,6 +7,7 @@ import { Outlet, useOutletContext } from 'react-router-dom';
 import AddFluidForm from './AddFluidForm';
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
+import AddActivityToCalendarForm from './AddActivityToCalendarForm';
 
 const CalendarPage = () => {
   const { nutritionGoal } = useOutletContext();
@@ -39,7 +40,7 @@ const CalendarPage = () => {
     },
   ];
 
-  const [events, setEvents] = useState(initialEvents);
+  const [events, setEvents] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [overviewData, setOverviewData] = useState(null);
   const [fluidIntake, setFluidIntake] = useState({});
@@ -59,12 +60,36 @@ const CalendarPage = () => {
           id: doc.id,
           ...doc.data()
         }));
-        setEvents(fetchedEvents);
+        setEvents((prev) => [...prev, ...fetchedEvents]);
       } catch (error) {
         console.error('Chyba pri načítaní udalostí:', error);
       }
     }; 
    fetchEvents() 
+  }, [])
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const user = auth.currentUser;
+      if(!user) return;
+
+      try {
+        const q = query(
+          collection(db, 'calendarActivities'),
+          where('userId', '==', user.uid)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const fetchedEvents = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setEvents((prev) => [...prev, ...fetchedEvents]);
+      } catch (error) {
+        console.error('Chyba pri načítaní udalostí:', error);
+      }
+    }
+    fetchEvents()
   }, [])
 
   useEffect(() => {
@@ -75,15 +100,15 @@ const CalendarPage = () => {
   }, [events, selectedDate, fluidIntake]);
 
   const updateOverviewData = (dayEvents) => {
-    let sumKcal = 0, sumProtein = 0, sumFat = 0, sumCarbs = 0, sumFiber = 0, sumFluid = 0, sumBurned = 0;
+    let sumKcal = 0, sumProtein = 0, sumFat = 0, sumCarbs = 0, sumFiber = 0, sumBurned = 0;
     dayEvents.forEach((ev) => {
       const { kcal, protein, fat, carbs, fiber, burned } = ev.extendedProps;
-      sumKcal += kcal;
-      sumProtein += protein;
-      sumFat += fat;
-      sumCarbs += carbs;
-      sumFiber += fiber;
-      sumBurned += burned;
+      sumKcal += Number(kcal) || 0;
+  sumProtein += Number(protein) || 0;
+  sumFat += Number(fat) || 0;
+  sumCarbs += Number(carbs) || 0;
+  sumFiber += Number(fiber) || 0;
+  sumBurned += Number(burned) || 0;
     });
 
     const currentFluid = fluidIntake[selectedDate] || 0;
@@ -112,19 +137,45 @@ const CalendarPage = () => {
       console.error('Používateľ nie je prihlásený');
       return;
     }
+
+    const eventToSave = {
+      ...newEvent,
+      type: 'food',
+      userId: user.uid,
+      createdAt: new Date(),
+      userName: user.displayName,
+    };
+
     try {
-      const docRef = await addDoc(collection(db, 'calendarEvents'), {
-        ...newEvent,
-        userId: user.uid,
-        createdAt: new Date(),
-        userName: user.displayName
-      });
-      newEvent.id = docRef.id;
-      setEvents((prev) => [...prev, newEvent])
+      const docRef = await addDoc(collection(db, 'calendarEvents'), eventToSave);
+          eventToSave.id = docRef.id;
+          setEvents((prev) => [...prev, eventToSave]);
     } catch (error) {
       console.error('Chyba pri pridávaní udalosti:', error);
     }
     
+  }
+
+  const handleAddActivity = async (newActivity) => {
+    const user = auth.currentUser;
+    if(!user) return;
+
+    const activityToSave = {
+      ...newActivity,
+      type: 'activity',
+      userId: user.uid,
+      createdAt: new Date(),
+      userName: user.displayName,
+    };
+    
+    try {
+      const docRef = await addDoc(collection(db, 'calendarActivities'), activityToSave);
+          activityToSave.id = docRef.id;
+          setEvents((prev) => [...prev, activityToSave]);
+    } catch (error) {
+      console.error('Chyba pri pridávaní udalosti:', error);
+    }
+
   }
 
   const handleDeleteFood = async (eventId) => {
@@ -136,12 +187,33 @@ const CalendarPage = () => {
     }
   }
 
+  const handleDeleteActivity = async (eventId) => {
+    try {
+      await deleteDoc(doc(db, 'calendarActivities', eventId));
+      setEvents((prev) => prev.filter((event) => event.id !== eventId))
+
+    } catch (error) {
+      console.error('Chyba pri mazaní udalosti:', error);
+    }
+  }
+
+  const handleDeleteEvent = async (eventId, eventType) => {
+    if (eventType === 'activity') {
+      await handleDeleteActivity(eventId);
+    } else {
+      // predpoklad: "food"
+      await handleDeleteFood(eventId);
+    }
+  };
+
   const handleAddFluid = (date, amount) => {
     setFluidIntake((prev) => ({
       ...prev,
       [date]: (prev[date] || 0) + amount,
     }))
   }
+
+ 
 
   const eventsForDay = selectedDate ? events.filter((e) => e.start === selectedDate) : [];
 
@@ -156,14 +228,21 @@ const CalendarPage = () => {
           <AddFoodForm selectedDate={selectedDate} onAddFood={handleAddFood} />
           )}
           {selectedDate && (
-          <AddFluidForm selectedDate={selectedDate} onAddFluid={(amount) => handleAddFluid(selectedDate, amount)} />
-
+            <>
+            <AddFluidForm selectedDate={selectedDate} onAddFluid={(amount) => handleAddFluid(selectedDate, amount)} />
+            <AddActivityToCalendarForm
+              selectedDate={selectedDate}
+              onAddActivityEvent={handleAddActivity}
+            />
+            </>
           )}
+
+          
       <DayDetailPanel
         selectedDate={selectedDate}
         overviewData={overviewData}
         eventsForDay={eventsForDay}
-        onDeleteEvent={handleDeleteFood}
+        onDeleteEvent={handleDeleteEvent}
         />
         </div>
     </div>

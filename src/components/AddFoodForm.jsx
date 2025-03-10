@@ -67,8 +67,6 @@ const AddFoodForm = ({ selectedDate, onAddFood }) => {
             fat: selectedFood.fat,
             carbs: selectedFood.carbs,
             fiber: selectedFood.fiber,
-            fluid: selectedFood.fluid,
-            burned: 0,
           },
         }
       : {
@@ -80,8 +78,6 @@ const AddFoodForm = ({ selectedDate, onAddFood }) => {
             fat: 0,
             carbs: 0,
             fiber: 0,
-            fluid: 0,
-            burned: 0,
           },
         }
 

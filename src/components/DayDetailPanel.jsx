@@ -11,13 +11,13 @@ const DayDetailPanel = ({ selectedDate, overviewData, eventsForDay, onDeleteEven
                 <DailyNutritionOverview data={overviewData} />
                 {/*Zoznam jedal daneho dna*/}
                 <div className="mt-4">
-                    <h3 className="text-lg font-semibold text-green-600 mb-2">Jedlá dňa</h3>
+                    <h3 className="text-lg font-semibold text-green-600 mb-2">Jedlá a aktivity dňa</h3>
                     <ul className='space-y-2 text-sm'>
                         {eventsForDay.map((event, index) => (
                             <li key={index} className='p-2 bg-green-100 rounded shadow border-l-4 border-green-500'>
                                 {event.title}
                                 <button
-                    onClick={() => onDeleteEvent(event.id)}
+                    onClick={() => onDeleteEvent(event.id, event.type)}
                     className="bg-red-500 text-white px-2 py-1 ml-5 rounded hover:bg-red-600"
                   >
                     Zmazať

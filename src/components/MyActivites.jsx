@@ -3,7 +3,7 @@ import ActivitesForm from './ActivitesForm';
 import { useOutletContext } from 'react-router-dom';
 
 const MyActivites = () => {
-    const { handleEditActivity, handleAddActivity, savedActivities, handleDeleteActivity } = useOutletContext()
+    const { handleEditActivity, handleAddActivity, savedActivities, handleDeleteActivity, handleAddEventToCalendar } = useOutletContext()
     
     const [editingId, setEditingId] = useState(null);
     const [editData, setEditData] = useState({
