@@ -37,7 +37,7 @@ const NutritionCalculator = () => {
 
   return (
     <section className="max-w-4xl mx-auto py-16 px-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-4xl font-semibold text-green-700 text-center mb-6">BMI kalkulačka</h2>
+      <h2 className="text-4xl font-semibold text-green-700 text-center mb-6">BMR kalkulačka</h2>
 
       <form 
         onSubmit={calculateCalories} 

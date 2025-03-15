@@ -67,6 +67,35 @@ const CalendarPage = () => {
     }; 
    fetchEvents() 
   }, [])
+  
+  useEffect(() => {
+    const fetchFluidIntake = async () => {
+      const user = auth.currentUser;
+      if(!user) return;
+
+      try {
+        const q = query(
+          collection(db, 'calendarFluids'),
+          where('userId', '==', user.uid)
+        )
+
+        const querySnapshot = await getDocs(q);
+        const fluidsData = {};
+
+        querySnapshot.docs.forEach(doc => {
+          const data = doc.data();
+          const { date, amount } = data;
+          fluidsData[date] = (fluidsData[date] || 0) + amount;
+        });
+
+        setFluidIntake(fluidsData);
+      } catch (error) {
+        console.error('Chyba pri načítaní údajov o tekutinách:', error);
+      }
+    }
+
+    fetchFluidIntake()
+  }, [])
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -111,6 +140,7 @@ const CalendarPage = () => {
   sumBurned += Number(burned) || 0;
     });
 
+    sumKcal = Math.round(sumKcal);
     const currentFluid = fluidIntake[selectedDate] || 0;
 
     const aggregatedData = {
@@ -206,11 +236,30 @@ const CalendarPage = () => {
     }
   };
 
-  const handleAddFluid = (date, amount) => {
-    setFluidIntake((prev) => ({
-      ...prev,
-      [date]: (prev[date] || 0) + amount,
-    }))
+  const handleAddFluid = async (date, amount) => {
+    const user = auth.currentUser;
+    if(!user) return;
+
+    const fluidData = {
+      userId: user.uid,
+      userName: user.displayName,
+      date,
+      amount,
+      createdAt: new Date(),
+    };
+
+    try {
+       const docRef = await addDoc(collection(db, 'calendarFluids'), fluidData)
+
+       fluidData.id = docRef.id;
+
+      setFluidIntake((prev) => ({
+        ...prev,
+        [date]: (prev[date] || 0) + amount,
+      }))
+    } catch (error) {
+      console.error('Chyba pri pridávaní udalosti:', error);
+    }
   }
 
  
