@@ -8,6 +8,7 @@ import AddFluidForm from './AddFluidForm';
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 import AddActivityToCalendarForm from './AddActivityToCalendarForm';
+import { fetchAggregatedStats } from '../services/statsService'
 
 const CalendarPage = () => {
   const { nutritionGoal } = useOutletContext();
@@ -265,7 +266,6 @@ const CalendarPage = () => {
  
 
   const eventsForDay = selectedDate ? events.filter((e) => e.start === selectedDate) : [];
-
 
   return (
     <div className='flex flex-col lg:flex-row gap-6 p-4'>

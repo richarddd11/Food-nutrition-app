@@ -20,6 +20,7 @@ import Privacy from './components/Privacy'
 import MyFoods from './components/MyFoods';
 import CalendarPage from './components/CalendarPage';
 import MyActivites from './components/MyActivites';
+import StatisticsPage from './components/StatisticsPage';
 
 
 
@@ -166,6 +167,7 @@ function App() {
         <Route path="calendar" element={<ProtectedRoute> <CalendarPage /> </ProtectedRoute>} />
         <Route path="my-foods" element={<ProtectedRoute> <MyFoods /> </ProtectedRoute> } />
         <Route path="my-activites" element={<ProtectedRoute> <MyActivites /> </ProtectedRoute> } />
+        <Route path="statistics" element={<ProtectedRoute> <StatisticsPage /> </ProtectedRoute> } />
       </Route>
         </Routes>
         </div>
