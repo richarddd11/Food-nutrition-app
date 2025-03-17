@@ -2,21 +2,10 @@ import { collection, query, where, getDocs } from 'firebase/firestore'
 import { auth, db } from '../config/firebase'
 
 
-/**
- * Pomocná funkcia na vygenerovanie reťazca YYYY-MM-DD z Date objektu.
- */
-function formatDate(dateObj) {
-    return dateObj.toISOString().split('T')[0] // '2025-03-16' napr.
-}
 
-/**
- * Vráti objekt statsByDay, kde pre každý deň v rozsahu [startDate; endDate]
- * spočítame:
- *   - kcal, protein, fat, carbs, fiber, fluid, burned
- * 
- * @param {Date} startDate - Počiatočný dátum, inclusive
- * @param {Date} endDate   - Koncový dátum, inclusive
- */
+function formatDate(dateObj) {
+    return dateObj.toISOString().split('T')[0] 
+}
 
 export async function fetchAggregatedStats(startDate, endDate) {
     const user = auth.currentUser
