@@ -15,7 +15,7 @@ const AddActivityToCalendarForm = ({ selectedDate, onAddActivityEvent }) => {
 
         const newEvent = {
             title: chosenActivity.activityName,
-            start: chosenDate,
+            start: selectedDate,
             type: 'activity',
             extendedProps: {
                 burned: chosenActivity.burnedCalories,

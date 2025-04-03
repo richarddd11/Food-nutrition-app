@@ -139,7 +139,8 @@ const Register = () => {
     
     setError(null);
     return true;
-  };
+    
+  }; 
   
   const handleNextStepOne = async () => {
     const isValid = await validateStepOne();
@@ -210,7 +211,7 @@ const Register = () => {
 
       // Presmerovanie na verifikaciu
       setIsLoading(false)
-      navigate('/verify-email');
+      navigate('/verify-email'); 
     } catch (err) {
       setError('Chyba pri registrácii: ' + err.message);
     }

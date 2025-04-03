@@ -13,9 +13,10 @@ const VerifyEmail = () => {
                 navigate('/dashboard');
             } else {
                 alert('Email ešte nie je overený. Skontroluj schránku a skús znovu.');
-            }
+            } 
         }
     }
+
   return (
     <section className="pt-20 mt-30 max-w-md mx-auto py-10 px-6 bg-white shadow-lg rounded-lg">
     <h2 className="text-3xl font-semibold text-center text-green-700">Overenie emailu</h2>

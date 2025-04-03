@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase' 
 
 const Login = () => {
@@ -20,10 +20,17 @@ const Login = () => {
             setError('Chyba pri prihlasovaní: ' + err.message);
         }
     }
+
   return (
     <section className="max-w-md mx-auto py-10 px-6 mt-30 bg-white shadow-lg rounded-lg">
       <h2 className="text-3xl font-semibold text-center text-green-700">Prihlásenie</h2>
       {error && <p className="text-red-600 text-center mt-2">{error}</p>}
+
+      <div className="bg-gray-100 p-4 rounded-md mt-6 text-sm text-gray-700">
+          <p className="font-semibold mb-1">Demo účet:</p>
+          <p>Email: <span className="text-blue-600">exampleuseruser1@gmail.com</span></p>
+          <p>Heslo: <span className="text-blue-600">exampleUser1</span></p>
+        </div>
 
       <form onSubmit={handleLogin} className="mt-4">
         <label className="block mt-2">Email</label>

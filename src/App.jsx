@@ -21,6 +21,9 @@ import MyFoods from './components/MyFoods';
 import CalendarPage from './components/CalendarPage';
 import MyActivites from './components/MyActivites';
 import StatisticsPage from './components/StatisticsPage';
+import TestimonialSection from './components/TestimonialSection';
+import FAQSection from './components/FAQSection';
+import Footer from './components/Footer';
 
 
 
@@ -142,7 +145,10 @@ function App() {
         disabled={disabled}
         />
         <BlogSection />
+        <FAQSection />
+        <TestimonialSection />
         <NutritionCalculator />
+        <Footer />
         </>
           }
           />
