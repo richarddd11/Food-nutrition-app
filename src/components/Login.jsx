@@ -33,15 +33,13 @@ const Login = () => {
         </div>
 
       <form onSubmit={handleLogin} className="mt-4">
-        <label className="block mt-2">Email</label>
         <input value={email}
         onChange={(e) => setEmail(e.target.value)}
          type="email" placeholder="Email" className="border border-gray-300 rounded-lg px-4 py-2 w-full" />
 
-        <label className="block mt-2">Heslo</label>
         <input value={password}
         onChange={(e) => setPassword(e.target.value)}
-         type="password" placeholder="Heslo" className="border border-gray-300 rounded-lg px-4 py-2 w-full" />
+         type="password" placeholder="Heslo" className="border mt-4 border-gray-300 rounded-lg px-4 py-2 w-full" />
 
         <button 
           type="submit" 

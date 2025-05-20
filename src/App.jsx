@@ -26,7 +26,6 @@ import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
 
 
-
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -133,6 +132,8 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/logout' element={<Logout />} /> 
           <Route path="/dashboard" element={ <ProtectedRoute> <Dashboard /> </ ProtectedRoute>} />
+          
+
           <Route
           path='/'
           element={

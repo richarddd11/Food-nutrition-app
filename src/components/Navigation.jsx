@@ -45,7 +45,6 @@ const Navigation = () => {
         <>
           <Link to="/" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Domov</Link>
           <Link to="/results" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Vyhľadávanie</Link>
-          <Link to="/profil" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Profil</Link>
           <Link to="/dashboard" className='pr-7 text-[#616161] cursor-pointer hover:underline' onClick={onClickHandler}>Dashboard</Link>
           <Link to="/logout" className="pr-7 text-[#616161] hover:underline" onClick={onClickHandler}>Odhlásiť sa</Link>
         </>

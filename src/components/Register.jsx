@@ -228,7 +228,6 @@ const Register = () => {
         {/* KROK 1 */}
         {step === 1 && (
           <>
-            <label className='block mt-2'>Meno</label>
             <input 
               type="text"
               placeholder='Meno'
@@ -238,34 +237,31 @@ const Register = () => {
               className='border border-gray-300 rounded-lg px-4 py-2 w-full'
             />
 
-            <label className='block mt-2'>Email</label>
             <input
               type="email"
               placeholder='Email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+              className='border border-gray-300 rounded-lg mt-5 px-4 py-2 w-full'
             />
 
-            <label className='block mt-2'>Heslo</label>
             <input
               type="password"
               placeholder='Heslo'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+              className='border border-gray-300 mt-5 rounded-lg px-4 py-2 w-full'
             />
 
-            <label className='block mt-2'>Potvrdiť heslo</label>
             <input
               type="password"
               placeholder='Potvrdiť heslo'
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className='border border-gray-300 rounded-lg px-4 py-2 w-full'
+              className='border border-gray-300 mt-5 rounded-lg px-4 py-2 w-full'
             />
 
             <div className="mt-6 flex items-start">
